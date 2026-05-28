@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 
 
 const registerController = async (req, res) => {
-    const { name, email, password } = req.body
+    const { name, email, password, role } = req.body
     try {
         let userExistes = await User.findOne({ email })
         if (userExistes) {
@@ -15,12 +15,13 @@ const registerController = async (req, res) => {
         const user = await User.create({
             name,
             email,
-            password: await bcrypt.hash(password, 10)
+            password: await bcrypt.hash(password, 10),
+            role: role
         })
         const token = generateToken(user._id, user.role)
 
-        // console.log("user one");
-        // console.log(user);
+        console.log("user one");
+        console.log(user);
 
         res.cookie("token", token, {
             httpOnly: true,
