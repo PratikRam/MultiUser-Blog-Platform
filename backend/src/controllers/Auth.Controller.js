@@ -16,7 +16,7 @@ const registerController = async (req, res) => {
             name,
             email,
             password: await bcrypt.hash(password, 10),
-            role: role
+            role: role ? role.toLowerCase() : 'visitor'
         })
         const token = generateToken(user._id, user.role)
 
