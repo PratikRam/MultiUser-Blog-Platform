@@ -59,7 +59,7 @@ const LoginForm = () => {
       if (data?.user && data?.token) {
         setAuth(data.user, data.token);
       }
-      router.push('/Dashboard');
+      router.push('/dashboard');
     },
 
     onError: (error: AxiosError<ErrorResponse>) => {
