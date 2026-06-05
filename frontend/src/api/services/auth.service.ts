@@ -1,5 +1,5 @@
 import api from "@/src/api/axios";
-import type { RegisterFormData, LoginFormData } from "@/src/types/index";
+import type { RegisterFormData, LoginFormData, UpdateProfileFormData } from "@/src/types/index";
 
 const registerUser = async (data: RegisterFormData) => {
   const res = await api.post("/auth/register", data);
@@ -16,9 +16,14 @@ const getCurrentUser = async () => {
   return response.data;
 };
 
-const logoutUser = async () => {
+const logoutUser = async () => {  
   const response = await api.post("/auth/logout");
   return response.data;
 };
 
-export { registerUser, loginUser, getCurrentUser, logoutUser };
+const updateProfile = async (data: UpdateProfileFormData) => {
+  const response = await api.put("/auth/profile", data);
+  return response.data;
+};
+
+export { registerUser, loginUser, getCurrentUser, logoutUser, updateProfile };

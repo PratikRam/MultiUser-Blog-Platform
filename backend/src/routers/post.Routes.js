@@ -7,11 +7,15 @@ const {
     getAllPosts,
     getPostBySlug,
     deletePost,
+    getCreatorPosts,
+    updatePost,
 } = require("../controllers/Post.Controller.js");
 
 const router = express.Router();
 
 router.get("/", getAllPosts);
+
+router.get("/creator", protect, checkRole("creator"), getCreatorPosts);
 
 router.get("/:slug", getPostBySlug);
 
@@ -20,6 +24,13 @@ router.post(
     protect,
     checkRole("creator"),
     createPost
+);
+
+router.put(
+    "/:id",
+    protect,
+    checkRole("creator"),
+    updatePost
 );
 
 router.delete(

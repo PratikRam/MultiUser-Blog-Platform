@@ -7,6 +7,9 @@ const cookieParser = require('cookie-parser')
 
 const registerController = async (req, res) => {
     const { name, email, password, role } = req.body
+    if (!password) {
+        return res.status(400).json({ message: 'Password is required' });
+    }
     try {
         let userExistes = await User.findOne({ email })
         if (userExistes) {
@@ -55,6 +58,14 @@ const loginController = async (req, res) => {
             })
             return
         }
+
+        if (!userOne.password) {
+            res.status(400).json({
+                message: "This account was registered using Google OAuth. Please log in using Google."
+            })
+            return
+        }
+
         const userPassword = await bcrypt.compare(password, userOne.password)
 
         if (!userPassword) {
@@ -111,5 +122,71 @@ const logoutController = (req, res) => {
     }
 };
 
-module.exports = { registerController, loginController, logoutController }
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { name, email, role, password } = req.body;
 
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // If email is changing, verify if it's already taken
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email });
+            if (emailExists) {
+                return res.status(400).json({ message: "Email is already taken" });
+            }
+            user.email = email;
+        }
+
+        if (name) {
+            user.name = name;
+        }
+
+        if (role) {
+            const normalizedRole = role.toLowerCase(); 
+            if (normalizedRole === 'visitor' || normalizedRole === 'creator') {
+                user.role = normalizedRole;
+            } else {
+                return res.status(400).json({ message: "Invalid role value" });
+            }
+        }
+
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+
+        await user.save();
+
+        // Regenerate JWT token since details like role might have changed
+        const token = generateToken(user._id, user.role);
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false, // localhost
+            sameSite: "Lax"
+        });
+
+        // Exclude password from the returned user
+        const updatedUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        };
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: updatedUser,
+            token
+        });
+    } catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({ message: "Server error during profile update" });
+    }
+};
+
+module.exports = { registerController, loginController, logoutController, updateProfile };

@@ -109,9 +109,82 @@ const deletePost = async (req, res) => {
     }
 };
 
+const getCreatorPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({
+            authorId: req.user._id,
+        })
+            .populate("authorId", "name")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+const updatePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+            return res.status(404).json({
+                message: "Post not found",
+            });
+        }
+
+        if (post.authorId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "Unauthorized",
+            });
+        }
+
+        const {
+            title,
+            htmlContent,
+            category,
+            coverImage,
+            excerpt,
+            seoKeywords,
+            status,
+        } = req.body;
+
+        if (title && title !== post.title) {
+            const slug = slugify(title);
+            const existingSlug = await Post.findOne({ slug });
+            if (existingSlug && existingSlug._id.toString() !== post._id.toString()) {
+                return res.status(400).json({
+                    message: "Slug already exists for this title",
+                });
+            }
+            post.title = title;
+            post.slug = slug;
+        }
+
+        if (htmlContent !== undefined) post.htmlContent = htmlContent;
+        if (category !== undefined) post.category = category;
+        if (coverImage !== undefined) post.coverImage = coverImage;
+        if (excerpt !== undefined) post.excerpt = excerpt;
+        if (seoKeywords !== undefined) post.seoKeywords = seoKeywords;
+        if (status !== undefined) post.status = status;
+
+        await post.save();
+
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getAllPosts,
     getPostBySlug,
     deletePost,
+    getCreatorPosts,
+    updatePost,
 };

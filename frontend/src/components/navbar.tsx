@@ -4,20 +4,24 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { BookOpen, Home, LayoutDashboard, User, Menu, X } from "lucide-react"
+import { useAuthStore } from "@/src/store/auth.store"
 
 const Navbar = () => {
     const pathname = usePathname()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const user = useAuthStore((state) => state.user)
+
+    const isCreator = user?.role?.toLowerCase() === "creator"
 
     const navLinks = [
         { href: "/feed", label: "Home", icon: Home },
-        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        ...(isCreator ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : []),
         { href: "/profile", label: "Profile", icon: User },
     ]
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md shadow-md shadow-gray-300">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo / Brand */}
                     <div className="flex items-center">
@@ -40,11 +44,10 @@ const Navbar = () => {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                        isActive
+                                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
                                             ? "bg-secondary text-secondary-foreground font-semibold shadow-xs"
                                             : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-                                    }`}
+                                        }`}
                                 >
                                     <Icon className="h-4 w-4" />
                                     <span>{link.label}</span>
@@ -56,11 +59,11 @@ const Navbar = () => {
                     {/* Mobile Menu Button */}
                     <div className="flex md:hidden">
                         <button
-                          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                          type="button"
-                          className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-secondary/60 hover:text-foreground focus:outline-hidden"
-                          aria-controls="mobile-menu"
-                          aria-expanded={isMobileMenuOpen}
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            type="button"
+                            className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-secondary/60 hover:text-foreground focus:outline-hidden"
+                            aria-controls="mobile-menu"
+                            aria-expanded={isMobileMenuOpen}
                         >
                             <span className="sr-only">Open main menu</span>
                             {isMobileMenuOpen ? (
@@ -85,11 +88,10 @@ const Navbar = () => {
                                     key={link.href}
                                     href={link.href}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium transition-all duration-150 ${
-                                        isActive
+                                    className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium transition-all duration-150 ${isActive
                                             ? "bg-secondary text-secondary-foreground font-semibold"
                                             : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-                                    }`}
+                                        }`}
                                 >
                                     <Icon className="h-5 w-5" />
                                     <span>{link.label}</span>
@@ -103,4 +105,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default Navbar
