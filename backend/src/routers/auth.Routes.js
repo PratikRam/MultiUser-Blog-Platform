@@ -1,5 +1,13 @@
 const express = require('express')
-const { registerController, loginController, logoutController, updateProfile } = require('../controllers/Auth.Controller')
+const { 
+    registerController, 
+    loginController, 
+    logoutController, 
+    updateProfile,
+    forgotPasswordController,
+    verifyOtpController,
+    resetPasswordController
+} = require('../controllers/Auth.Controller')
 const router = express.Router()
 const protect = require('../middleware/authMiddleware')
 const AuthMeController = require('../controllers/AuthMe.Controller')
@@ -10,6 +18,9 @@ const generateToken = require('../utils/generateToken')
 router.post('/register', registerController)
 router.post('/login', loginController)
 router.post('/logout', logoutController)
+router.post('/forgot-password', forgotPasswordController)
+router.post('/verify-otp', verifyOtpController)
+router.post('/reset-password', resetPasswordController)
 
 router.get('/authme', protect, AuthMeController)
 router.put('/profile', protect, updateProfile)

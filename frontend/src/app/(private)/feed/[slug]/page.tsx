@@ -1,9 +1,7 @@
-"use client";
-
 import React from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, User, Tag, Loader2, Image as ImageIcon } from "lucide-react";
+import Link from "next/link";
+import { Metadata } from "next";
+import { ArrowLeft, Calendar, User, Tag, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getPostBySlug } from "@/src/api/services/post.service";
@@ -12,7 +10,7 @@ interface PostAuthor {
   name: string;
 }
 
-interface BlogPost {
+interface BlogPost {    
   _id: string;
   title: string;
   slug: string;
@@ -24,29 +22,48 @@ interface BlogPost {
   authorId?: PostAuthor;
 }
 
-const PostDetailPage = () => {
-  const params = useParams();
-  const router = useRouter();
-  const slug = params?.slug as string;
+type Props = {
+  params: Promise<{ slug: string }>;
+};
 
-  const { data: post, isLoading, isError } = useQuery<BlogPost>({
-    queryKey: ["post", slug],
-    queryFn: () => getPostBySlug(slug),
-    enabled: !!slug,
-    retry: 1,
-  });
+// 1. Dynamic Meta Injection for search engines and preview cards
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  
+  try {
+    const post: BlogPost = await getPostBySlug(slug);
+    
+    return {
+      title: `${post.title} | Eng.Journal`,
+      description: post.excerpt,
+      openGraph: {
+        title: post.title,
+        description: post.excerpt,
+        images: post.coverImage ? [{ url: post.coverImage }] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Article Not Found | Eng.Journal",
+      description: "The requested article could not be found.",
+    };
+  }
+}
 
-  if (isLoading) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-        <p className="text-muted-foreground text-sm font-medium animate-pulse">
-          Opening article details...
-        </p>
-      </div>
-    );
+// 2. Server Component Page rendering post details immediately
+const PostDetailPage = async ({ params }: Props) => {
+  const { slug } = await params;
+
+  let post: BlogPost | null = null;
+  let isError = false;
+
+  try {
+    post = await getPostBySlug(slug);
+  } catch (error) {
+    isError = true;
   }
 
+  // Error Card if post is not found
   if (isError || !post) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center px-4">
@@ -57,9 +74,11 @@ const PostDetailPage = () => {
         <p className="text-sm text-muted-foreground mt-2 mb-6">
           The blog post you are trying to view does not exist or may have been deleted.
         </p>
-        <Button onClick={() => router.push("/feed")} className="w-full">
-          Return to Feed
-        </Button>
+        <Link href="/feed" className="w-full">
+          <Button className="w-full cursor-pointer">
+            Return to Feed
+          </Button>
+        </Link>
       </div>
     );
   }
@@ -75,14 +94,15 @@ const PostDetailPage = () => {
     <div className="flex-1 max-w-4xl mx-auto w-full my-8 px-4 sm:px-6 lg:px-8">
       {/* Back to Feed */}
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => router.push("/feed")}
-          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground h-9 cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Feed
-        </Button>
+        <Link href="/feed">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground h-9 cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Feed
+          </Button>
+        </Link>
       </div>
 
       {/* Main Post Card container */}

@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const generateToken = require('../utils/generateToken.js')
 const cookieParser = require('cookie-parser')
+const sendEmail = require('../utils/sendEmail.js')
 
 
 const registerController = async (req, res) => {
@@ -189,4 +190,107 @@ const updateProfile = async (req, res) => {
     }
 };
 
-module.exports = { registerController, loginController, logoutController, updateProfile };
+const forgotPasswordController = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "Account not found with this email" });
+        }
+
+        // Generate a 6-digit OTP code
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Save OTP and 10 minutes expiry to user
+        user.otpCode = otp;
+        user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save();
+
+        // Send OTP via Email
+        const emailSent = await sendEmail({
+            email: user.email,
+            subject: "Your OTP for Password Reset",
+            text: `Hello ${user.name},\n\nYou requested a password reset. Your 6-digit verification OTP code is: ${otp}\n\nThis OTP is valid for 10 minutes.\n\nIf you did not request this, please ignore this email.`
+        });
+
+        res.status(200).json({
+            success: true,
+            message: emailSent 
+                ? "OTP sent successfully to your email address!" 
+                : "OTP generated successfully (printed to server log).",
+            otp: emailSent ? undefined : otp // Expose OTP only if email dispatch was skipped/failed
+        });
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        res.status(500).json({ message: "Server error during forgot password" });
+    }
+};
+
+const verifyOtpController = async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return res.status(400).json({ message: "Email and OTP are required" });
+    }
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.otpCode !== otp || user.otpExpires < Date.now()) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "OTP verified successfully!"
+        });
+    } catch (error) {
+        console.error("Verify OTP error:", error);
+        res.status(500).json({ message: "Server error during OTP verification" });
+    }
+};
+
+const resetPasswordController = async (req, res) => {
+    const { email, otp, password } = req.body;
+    if (!email || !otp || !password) {
+        return res.status(400).json({ message: "Email, OTP, and Password are required" });
+    }
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.otpCode !== otp || user.otpExpires < Date.now()) {
+            return res.status(400).json({ message: "Invalid or expired OTP session" });
+        }
+
+        // Hash new password and save
+        user.password = await bcrypt.hash(password, 10);
+        user.otpCode = null;
+        user.otpExpires = null;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset successfully! You can now log in."
+        });
+    } catch (error) {
+        console.error("Reset password error:", error);
+        res.status(500).json({ message: "Server error during password reset" });
+    }
+};
+
+module.exports = { 
+    registerController, 
+    loginController, 
+    logoutController, 
+    updateProfile,
+    forgotPasswordController,
+    verifyOtpController,
+    resetPasswordController
+};

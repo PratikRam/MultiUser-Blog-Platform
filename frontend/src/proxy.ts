@@ -10,50 +10,37 @@ export default function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const pathname = request.nextUrl.pathname;
 
-  // Auth pages
-  const isAuthRoute =
-    pathname === "/login" || pathname === "/register";
+  const isAuthPage =
+    pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
 
-  // User not logged in
+  // Not logged in
   if (!token) {
-    if (isAuthRoute) {
-      return NextResponse.next();
-    }
-
-    return NextResponse.redirect(
-      new URL("/login", request.url)
-    );
+    return isAuthPage
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Decode token
   let user: TokenPayload;
 
   try {
     user = jwtDecode<TokenPayload>(token);
   } catch {
-    return NextResponse.redirect(
-      new URL("/login", request.url)
-    );
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Logged-in users cannot access login/register
-  if (isAuthRoute) {
-    return NextResponse.redirect(
-      new URL("/feed", request.url)
-    );
+  // Logged-in users cannot visit login/register/forgot-password
+  if (isAuthPage) {
+    return NextResponse.redirect(new URL("/feed", request.url));
   }
 
-  // Visitor restrictions
-  if (user.role === "visitor") {
-    // Visitor cannot access dashboard
-    if (pathname.startsWith("/dashboard")) {
-      return NextResponse.redirect(
-        new URL("/feed", request.url)
-      );
-    }
+  // Visitor cannot access dashboard
+  if (
+    user.role === "visitor" &&
+    pathname.startsWith("/dashboard")
+  ) {
+    return NextResponse.redirect(new URL("/feed", request.url));
   }
 
-  // Creator can access both feed and dashboard
   return NextResponse.next();
 }
 
@@ -63,5 +50,6 @@ export const config = {
     "/dashboard/:path*",
     "/login",
     "/register",
+    "/forgot-password",
   ],
 };

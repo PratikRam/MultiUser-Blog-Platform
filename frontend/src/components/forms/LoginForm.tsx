@@ -59,7 +59,8 @@ const LoginForm = () => {
       if (data?.user && data?.token) {
         setAuth(data.user, data.token);
       }
-      router.push('/dashboard');
+      const isCreator = data?.user?.role?.toLowerCase() === 'creator';
+      router.push(isCreator ? '/dashboard' : '/feed');
     },
 
     onError: (error: AxiosError<ErrorResponse>) => {
@@ -112,6 +113,7 @@ const LoginForm = () => {
 
           <div className="space-y-1">
             <Label htmlFor="password">Password</Label>
+            <Label className='flex justify-end text-blue-600 cursor-pointer hover:underline'> <Link href="/forgot-password">Forgot Password?</Link> </Label>
 
             <Input
               id="password"
@@ -128,6 +130,7 @@ const LoginForm = () => {
               </p>
             )}
           </div>
+
 
           <Button
             type="submit"

@@ -23,6 +23,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["visitor", "creator"],
         default: "visitor"
+    },
+    otpCode: {
+        type: String,
+        default: null
+    },
+    otpExpires: {
+        type: Date,
+        default: null
     }
 });
 
