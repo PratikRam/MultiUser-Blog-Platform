@@ -152,8 +152,7 @@ const LoginForm = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={() => {
-              const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://multiuser-blog-platform.onrender.com/api';
-              window.location.href = `${apiBaseUrl}/auth/google`;
+              window.location.href = 'http://localhost:8080/api/auth/google';
             }}
           >
             <svg className="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">

@@ -5,7 +5,6 @@ const generateToken = require('../utils/generateToken.js')
 const cookieParser = require('cookie-parser')
 const sendEmail = require('../utils/sendEmail.js')
 
-const isProduction = process.env.NODE_ENV === 'production';
 
 const registerController = async (req, res) => {
     const { name, email, password, role } = req.body
@@ -30,8 +29,8 @@ const registerController = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "None" : "Lax"
+            secure: false,       // false on localhost
+            sameSite: "Lax"
         })
         res.status(201).json({
             message: "User registered successfully",
@@ -89,8 +88,8 @@ const loginController = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "None" : "Lax"
+            secure: false,       // false on localhost
+            sameSite: "Lax"
         })
 
         res.status(200).json({
@@ -110,8 +109,8 @@ const logoutController = (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "None" : "Lax",
+            secure: false,
+            sameSite: "Lax",
         });
 
         return res.status(200).json({
@@ -167,8 +166,8 @@ const updateProfile = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "None" : "Lax"
+            secure: false, // localhost
+            sameSite: "Lax"
         });
 
         // Exclude password from the returned user
