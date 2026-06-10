@@ -9,18 +9,8 @@ const passport = require("./config/passport");
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: function (origin, callback) {
-        if (
-            !origin ||
-            origin.includes("localhost") ||
-            origin.endsWith(".vercel.app")
-        ) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
+    origin: 'http://localhost:3000',
+    credentials: true,
 }));
 app.use(passport.initialize());
 
