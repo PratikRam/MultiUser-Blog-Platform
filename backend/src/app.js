@@ -10,10 +10,12 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
     origin: function (origin, callback) {
+        const clientUrl = process.env.CLIENT_URL;
         if (
             !origin ||
             origin.includes("localhost") ||
-            origin.endsWith(".vercel.app")
+            origin.endsWith(".vercel.app") ||
+            (clientUrl && (origin === clientUrl || origin === clientUrl.replace(/\/$/, '')))
         ) {
             callback(null, true);
         } else {
