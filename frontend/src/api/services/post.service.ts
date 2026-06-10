@@ -31,4 +31,15 @@ const updatePost = async (id: string, data: BlogPostFormData) => {
   return response.data;
 };
 
-export { createPost, getAllPosts, getPostBySlug, getCreatorPosts, deletePost, updatePost };
+const uploadImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const response = await api.post("/posts/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export { createPost, getAllPosts, getPostBySlug, getCreatorPosts, deletePost, updatePost, uploadImage };

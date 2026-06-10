@@ -3,8 +3,9 @@
   import React from "react";
   import Link from "next/link";
   import { useQuery } from "@tanstack/react-query";
-  import { Loader2, Calendar, User, Tag, ArrowRight, BookOpen } from "lucide-react";
+  import { Loader2, Calendar, User, Tag, ArrowRight, BookOpen, Search, X } from "lucide-react";
   import { Card, CardContent } from "@/components/ui/card";
+  import { Input } from "@/components/ui/input";
   import { getAllPosts } from "@/src/api/services/post.service";
 
   interface PostAuthor {
@@ -23,6 +24,8 @@
   }
 
   const FeedPage = () => {
+    const [search, setSearch] = React.useState("");
+
     const { data: posts, isLoading, isError } = useQuery<BlogPost[]>({
       queryKey: ["posts"],
       queryFn: getAllPosts,
@@ -56,36 +59,79 @@
 
     const publishedPosts = posts || [];
 
+    const filteredPosts = publishedPosts.filter((post) =>
+      post.title.toLowerCase().includes(search.toLowerCase())
+    );
+
     return (
       <div className="flex-1 max-w-7xl mx-auto w-full my-8 px-4 sm:px-6 lg:px-8">
         {/* Feed Page Header */}
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            Article Feed
-          </h1>
-          <p className="mt-2 text-base text-muted-foreground max-w-2xl">
-            Explore the latest posts, ideas, and stories from developers and creators across the platform.
-          </p>
+        <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div className="text-center md:text-left">
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+              Article Feed
+            </h1>
+            <p className="mt-2 text-base text-muted-foreground max-w-2xl">
+              Explore the latest posts, ideas, and stories from developers and creators across the platform.
+            </p>
+          </div>
+          <div className="w-full md:max-w-md relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search articles by title..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-9 h-10 w-full"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {publishedPosts.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-16 border border-dashed rounded-2xl bg-muted/20 text-center max-w-2xl mx-auto px-4">
-            <BookOpen className="h-12 w-12 text-muted-foreground/60 mb-4 stroke-[1.5]" />
-            <h3 className="text-lg font-bold text-foreground">No posts published yet</h3>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
-              Be the first to share your thoughts by creating a new post from the dashboard.
-            </p>
-            <Link
-              href="/dashboard/create-blog"
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 text-xs font-semibold shadow-xs"
-            >
-              Write First Post
-            </Link>
-          </div>
+        {filteredPosts.length === 0 ? (
+          search ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-16 border border-dashed rounded-2xl bg-muted/20 text-center max-w-2xl mx-auto px-4 w-full">
+              <Search className="h-12 w-12 text-muted-foreground/60 mb-4 stroke-[1.5]" />
+              <h3 className="text-lg font-bold text-foreground">No matching articles found</h3>
+              <p className="text-sm text-muted-foreground mt-1 mb-4">
+                We couldn&apos;t find any articles matching &ldquo;{search}&rdquo;. Try checking the spelling or search for something else.
+              </p>
+              <button
+                onClick={() => setSearch("")}
+                className="inline-flex h-9 items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 text-xs font-semibold shadow-xs"
+              >
+                Clear Search
+              </button>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center py-16 border border-dashed rounded-2xl bg-muted/20 text-center max-w-2xl mx-auto px-4">
+              <BookOpen className="h-12 w-12 text-muted-foreground/60 mb-4 stroke-[1.5]" />
+              <h3 className="text-lg font-bold text-foreground">No posts published yet</h3>
+              {/* <p className="text-sm text-muted-foreground mt-1 mb-4">
+                Be the first to share your thoughts by creating a new post from the dashboard.
+              </p>
+              <Link
+                href="/dashboard/create-blog"
+                className="inline-flex h-9 items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 text-xs font-semibold shadow-xs"
+              >
+                Write First Post
+              </Link> */}
+            </div>
+          )
         ) : (
           /* Responsive 2-to-3 Column Post Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {publishedPosts.map((post) => {
+            {filteredPosts.map((post) => {
               const dateStr = new Date(post.createdAt).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",

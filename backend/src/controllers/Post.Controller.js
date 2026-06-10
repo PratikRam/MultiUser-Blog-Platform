@@ -1,5 +1,7 @@
 const Post = require("../models/post.model.js");
 const slugify = require("../utils/slugify.js");
+const { uploadToCloudinary } = require("../utils/cloudinary.js");
+
 
 const createPost = async (req, res) => {
     try {
@@ -180,6 +182,27 @@ const updatePost = async (req, res) => {
     }
 };
 
+const uploadImage = async (req, res) => {   
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No image file provided",
+            });
+        }
+
+        const result = await uploadToCloudinary(req.file.buffer);
+        res.status(200).json({
+            url: result.secure_url,
+            public_id: result.public_id,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to upload image to Cloudinary",
+            error: error.message,
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getAllPosts,
@@ -187,4 +210,5 @@ module.exports = {
     deletePost,
     getCreatorPosts,
     updatePost,
+    uploadImage,
 };

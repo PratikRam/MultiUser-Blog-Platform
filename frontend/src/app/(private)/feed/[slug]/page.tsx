@@ -5,12 +5,13 @@ import { ArrowLeft, Calendar, User, Tag, Image as ImageIcon } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getPostBySlug } from "@/src/api/services/post.service";
+import DownloadPDFButton from "@/src/components/DownloadPDFButton";
 
 interface PostAuthor {
   name: string;
 }
 
-interface BlogPost {    
+interface BlogPost {
   _id: string;
   title: string;
   slug: string;
@@ -29,10 +30,11 @@ type Props = {
 // 1. Dynamic Meta Injection for search engines and preview cards
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  
+ 
+
   try {
     const post: BlogPost = await getPostBySlug(slug);
-    
+
     return {
       title: `${post.title} | Eng.Journal`,
       description: post.excerpt,
@@ -53,6 +55,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // 2. Server Component Page rendering post details immediately
 const PostDetailPage = async ({ params }: Props) => {
   const { slug } = await params;
+
+ 
 
   let post: BlogPost | null = null;
   let isError = false;
@@ -93,16 +97,19 @@ const PostDetailPage = async ({ params }: Props) => {
   return (
     <div className="flex-1 max-w-4xl mx-auto w-full my-8 px-4 sm:px-6 lg:px-8">
       {/* Back to Feed */}
-      <div className="mb-6">
-        <Link href="/feed">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground h-9 cursor-pointer"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Feed
-          </Button>
-        </Link>
+      <div className="mb-6 w-full flex items-center justify-between">
+        <div className="w-fit">
+          <Link href="/feed">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground h-9 cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Feed
+            </Button>
+          </Link>
+        </div>
+        <DownloadPDFButton post={post} />
       </div>
 
       {/* Main Post Card container */}
@@ -111,9 +118,9 @@ const PostDetailPage = async ({ params }: Props) => {
         {post.coverImage ? (
           <div className="w-full aspect-video md:max-h-[400px] relative bg-muted">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={post.coverImage} 
-              alt={post.title} 
+            <img
+              src={post.coverImage}
+              alt={post.title}
               className="object-cover w-full h-full"
             />
           </div>

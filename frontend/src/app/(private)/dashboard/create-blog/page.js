@@ -16,7 +16,10 @@ import {
   FileText,
   Search,
   CheckCircle2,
-  Lock
+  Lock,
+  UploadCloud,
+  Trash2,
+  Link as LinkIcon
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,12 +34,44 @@ import {
 } from "@/components/ui/card";
 
 import { getCurrentUser } from "@/src/api/services/auth.service";
-import { createPost } from "@/src/api/services/post.service";
+import { createPost, uploadImage } from "@/src/api/services/post.service";
 import { BlogPostSchema } from "@/src/types/index";
 
 const CreateBlogPage = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("edit"); // "edit" | "preview"
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size exceeds 5MB limit");
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      const res = await uploadImage(file);
+      setValue("coverImage", res.url);
+      toast.success("Image uploaded successfully!");
+    } catch (err) {
+      const message = err.response?.data?.message || "Failed to upload image";
+      toast.error(message);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setValue("coverImage", "");
+  };
 
   // 1. Fetch current user to verify role is CREATOR
   const { data: profileData, isLoading: isUserLoading, isError } = useQuery({
@@ -105,6 +140,7 @@ const CreateBlogPage = () => {
   const setStatusAndSubmit = (statusType) => {
     setValue("status", statusType);
   };
+
 
   // Loading State
   if (isUserLoading) {
@@ -199,7 +235,7 @@ const CreateBlogPage = () => {
                   <div className="space-y-1.5">
                     <Label htmlFor="title" className="text-sm font-semibold">
                       Post Title
-                    </Label>
+                    </Label> 
                     <Input
                       id="title"
                       placeholder="e.g., Understanding Next.js 16 App Router"
@@ -222,7 +258,7 @@ const CreateBlogPage = () => {
                       id="excerpt"
                       placeholder="Provide a brief summaries/teaser of your blog post (visible on feed cards)..."
                       rows={3}
-                      className="w-full min-h-[80px] px-3 py-2 rounded-lg border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full min-h-[40px] px-3 py-2 rounded-lg border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                       {...register("excerpt")}
                     />
                     {errors.excerpt && (
@@ -288,34 +324,63 @@ const CreateBlogPage = () => {
 
                   {/* Cover Image */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="coverImage" className="text-sm font-semibold flex items-center gap-1.5">
+                    <Label className="text-sm font-semibold flex items-center gap-1.5">
                       <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                      Cover Image URL
+                      Cover Image
                     </Label>
-                    <Input
-                      id="coverImage"
-                      type="url"
-                      placeholder="e.g., https://example.com/cover.jpg"
-                      className="h-10"
-                      {...register("coverImage")}
-                    />
+                    
+                    <div className="space-y-2">
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      
+                      {!coverImage ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full h-11 cursor-pointer border-dashed border-2 flex items-center justify-center gap-2 hover:border-blue-500/50 hover:bg-blue-50/50 dark:hover:bg-blue-950/20"
+                          disabled={isUploadingImage}
+                          onClick={() => document.getElementById("image-upload").click()}
+                        >
+                          {isUploadingImage ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin mr-1 text-blue-500" />
+                              Uploading to Cloudinary...
+                            </>
+                          ) : (
+                            <>
+                              <UploadCloud className="h-4 w-4 text-blue-500" />
+                              Upload Cover Image
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <div className="relative rounded-lg overflow-hidden border border-border/40 aspect-video bg-muted flex items-center justify-center group">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={coverImage} 
+                            alt="Cover preview" 
+                            className="object-cover w-full h-full"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
+                            title="Remove image"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     {errors.coverImage && (
                       <p className="text-xs text-red-500 mt-1">
                         {errors.coverImage.message}
                       </p>
-                    )}
-                    {coverImage && !errors.coverImage && (
-                      <div className="mt-2.5 rounded-lg overflow-hidden border border-border/40 aspect-video relative bg-muted flex items-center justify-center">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img 
-                          src={coverImage} 
-                          alt="Cover preview" 
-                          className="object-cover w-full h-full"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
                     )}
                   </div>
 

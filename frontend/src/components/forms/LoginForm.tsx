@@ -39,14 +39,14 @@ const LoginForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>
-      (
-        {
-          defaultValues: {
-            email: '',
-            password: '',
-          },
-        }
-      );
+    (
+      {
+        defaultValues: {
+          email: '',
+          password: '',
+        },
+      }
+    );
 
   const { mutate: login_user, isPending } = useMutation({
     mutationFn: (data: LoginFormData) => loginUser(data),

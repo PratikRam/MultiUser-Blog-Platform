@@ -36,7 +36,6 @@ const HomePage = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50/50 gap-4">
         <div className="relative flex items-center justify-center">
           <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
-          <div className="absolute w-16 h-16 border-2 border-indigo-600/10 rounded-full"></div>
         </div>
         <p className="text-muted-foreground text-sm font-semibold animate-pulse tracking-wide">
           Loading Eng.Journal...
@@ -51,10 +50,6 @@ const HomePage = () => {
       
       {/* Left side: Premium branding & feature panel (visible on md screens and above) */}
       <div className="hidden md:flex md:w-1/2 relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-12 flex-col justify-between text-white">
-        {/* Subtle decorative glowing background patterns */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
-        
         {/* Brand Header */}
         <div className="relative z-10 flex items-center gap-2.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
@@ -109,7 +104,7 @@ const HomePage = () => {
         </div>
 
         {/* Footer info */}
-        <div className="relative z-10 text-xs text-slate-400">
+        <div className="relative z-10 text-xs text-slate-400 mt-2">
           &copy; {new Date().getFullYear()} Eng.Journal. All rights reserved.
         </div>
       </div>

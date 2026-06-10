@@ -21,7 +21,6 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
     retry: false, // Do not retry on authentication failure
   });
 
-  // Sync state or redirect depending on query result
   useEffect(() => {
     if (data?.user) {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
