@@ -7,8 +7,8 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: `${process.env.BACKEND_URL || 'http://localhost:8080'}/api/auth/google/callback`,
-        },
+            callbackURL: 'http://localhost:8080/api/auth/google/callback',
+        },  
         async (accessToken, refreshToken, profile, done) => {
             try {
                 const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;

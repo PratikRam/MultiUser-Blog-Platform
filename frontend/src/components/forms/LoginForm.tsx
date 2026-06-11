@@ -152,7 +152,7 @@ const LoginForm = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={() => {
-              const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+              const apiBase = 'http://localhost:8080/api';
               window.location.href = `${apiBase}/auth/google`;
             }}
           >

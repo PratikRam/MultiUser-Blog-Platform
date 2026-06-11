@@ -36,8 +36,8 @@ router.get('/google/callback', passport.authenticate('google', { session: false,
     // Set the cookie
     res.cookie("token", token, {
         httpOnly: true,
-        secure: false, // localhost
-        sameSite: "Lax"
+        secure: true,
+        sameSite: "None"
     });
 
     // Redirect to frontend auth-success page with the token

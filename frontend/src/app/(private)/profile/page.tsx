@@ -7,17 +7,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Lock, 
-  Edit2, 
-  Save, 
-  X, 
-  Loader2, 
-  Eye, 
-  EyeOff, 
+import {
+  User,
+  Mail,
+  Shield,
+  Lock,
+  Edit2,
+  Save,
+  X,
+  Loader2,
+  Eye,
+  EyeOff,
   KeyRound,
   LogOut
 } from 'lucide-react';
@@ -44,7 +44,7 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const setAuth = useAuthStore((state) => state.setAuth);
   const logout = useAuthStore((state) => state.logout);
-  
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -125,7 +125,7 @@ const ProfilePage = () => {
       toast.success('Profile updated successfully!');
       setIsEditMode(false);
       setShowPasswordSection(false);
-      
+
       // Update store
       if (data?.user && data?.token) {
         localStorage.setItem('token', data.token);
@@ -134,7 +134,7 @@ const ProfilePage = () => {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         if (token) setAuth(data.user, token);
       }
-      
+
       // Refresh the query cache
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
@@ -188,11 +188,11 @@ const ProfilePage = () => {
   // Get user avatar initials
   const initials = user.name
     ? user.name
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+      .split(' ')
+      .map((n: string) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
     : 'U';
 
   const userRoleFormatted = user.role
@@ -228,7 +228,7 @@ const ProfilePage = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 {user.email}
               </p>
-              
+
               <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30">
                 <Shield className="h-3 w-3" />
                 {userRoleFormatted}
@@ -256,9 +256,9 @@ const ProfilePage = () => {
                   <CardDescription>Update your personal details and account role</CardDescription>
                 </div>
                 {!isEditMode && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     size="sm"
                     onClick={() => setIsEditMode(true)}
                     className="flex items-center gap-1.5 h-9"
@@ -271,7 +271,7 @@ const ProfilePage = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                
+
                 {/* Name Field */}
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-sm font-semibold flex items-center gap-1.5">
