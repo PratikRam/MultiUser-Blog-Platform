@@ -29,7 +29,7 @@ router.put('/profile', protect, updateProfile)
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
 // Google OAuth callback route - handles response from Google
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/login?error=GoogleAuthFailed` }), (req, res) => {
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'http://localhost:3000/login?error=GoogleAuthFailed' }), (req, res) => {
     // Generate JWT token
     const token = generateToken(req.user._id, req.user.role);
 
@@ -41,7 +41,7 @@ router.get('/google/callback', passport.authenticate('google', { session: false,
     });
 
     // Redirect to frontend auth-success page with the token
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth-success?token=${token}`);
+    res.redirect(`http://localhost:3000/auth-success?token=${token}`);
 })
 
 // Google OAuth failure callback route

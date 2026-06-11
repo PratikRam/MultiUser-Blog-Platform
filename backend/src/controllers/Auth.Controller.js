@@ -29,8 +29,8 @@ const registerController = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,       // false on localhost
-            sameSite: "Lax"
+            secure: true,
+            sameSite: "None"
         })
         res.status(201).json({
             message: "User registered successfully",
@@ -88,8 +88,8 @@ const loginController = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,       // false on localhost
-            sameSite: "Lax"
+            secure: true,
+            sameSite: "None"
         })
 
         res.status(200).json({
@@ -109,8 +109,8 @@ const logoutController = (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,
-            sameSite: "Lax",
+            secure: true,
+            sameSite: "None"
         });
 
         return res.status(200).json({
@@ -147,7 +147,7 @@ const updateProfile = async (req, res) => {
         }
 
         if (role) {
-            const normalizedRole = role.toLowerCase(); 
+            const normalizedRole = role.toLowerCase();
             if (normalizedRole === 'visitor' || normalizedRole === 'creator') {
                 user.role = normalizedRole;
             } else {
@@ -166,8 +166,8 @@ const updateProfile = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false, // localhost
-            sameSite: "Lax"
+            secure: true,
+            sameSite: "None"
         });
 
         // Exclude password from the returned user
@@ -218,8 +218,8 @@ const forgotPasswordController = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: emailSent 
-                ? "OTP sent successfully to your email address!" 
+            message: emailSent
+                ? "OTP sent successfully to your email address!"
                 : "OTP generated successfully (printed to server log).",
             otp: emailSent ? undefined : otp // Expose OTP only if email dispatch was skipped/failed
         });
@@ -285,10 +285,10 @@ const resetPasswordController = async (req, res) => {
     }
 };
 
-module.exports = { 
-    registerController, 
-    loginController, 
-    logoutController, 
+module.exports = {
+    registerController,
+    loginController,
+    logoutController,
     updateProfile,
     forgotPasswordController,
     verifyOtpController,
