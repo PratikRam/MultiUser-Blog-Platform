@@ -39,14 +39,14 @@ const LoginForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>
-    (
-      {
-        defaultValues: {
-          email: '',
-          password: '',
-        },
-      }
-    );
+      (
+        {
+          defaultValues: {
+            email: '',
+            password: '',
+          },
+        }
+      );
 
   const { mutate: login_user, isPending } = useMutation({
     mutationFn: (data: LoginFormData) => loginUser(data),
@@ -98,7 +98,7 @@ const LoginForm = () => {
             <Input
               id="email"
               type="email"
-              placeholder="john@example.com"
+              placeholder="hello@example.com"
               {...register('email', {
                 required: 'Email is required',
               })}
@@ -152,7 +152,8 @@ const LoginForm = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={() => {
-              window.location.href = 'http://localhost:8080/api/auth/google';
+              const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+              window.location.href = `${apiBase}/auth/google`;
             }}
           >
             <svg className="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">

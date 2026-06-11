@@ -169,6 +169,7 @@ const ProfilePage = () => {
     setShowPasswordSection(false);
   };
 
+
   if (isLoading) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] gap-3">
@@ -328,17 +329,30 @@ const ProfilePage = () => {
 
                 {/* Role Field */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold flex items-center gap-1.5">
+                  <Label htmlFor="role" className="text-sm font-semibold flex items-center gap-1.5">
                     <Shield className="h-4 w-4 text-muted-foreground" />
-                    Account Role
+                    Account Role <span className='text-xs text-muted-foreground '> (You can change the role)</span>
                   </Label>
-                  <p className="text-sm font-medium text-foreground py-2 px-3 bg-secondary/30 rounded-lg border border-transparent">
-                    {userRoleFormatted} (Access: {user.role === 'creator' ? 'Write & Publish' : 'Read Only'})
-                  </p>
-                  {isEditMode && (
-                    <span className="text-xs text-muted-foreground block">
-                      Role cannot be changed. Please contact administration for role updates.
-                    </span>
+                  {isEditMode ? (
+                    <div>
+                      <select
+                        id="role"
+                        className="flex h-10 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+                        {...register('role')}
+                      >
+                        <option value="VISITOR" className="bg-background text-foreground">Visitor - Read blogs</option>
+                        <option value="CREATOR" className="bg-background text-foreground">Creator - Write blogs</option>
+                      </select>
+                      {errors.role && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.role.message}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium text-foreground py-2 px-3 bg-secondary/30 rounded-lg border border-transparent">
+                      {userRoleFormatted} (Access: {user.role === 'creator' ? 'Write & Publish' : 'Read Only'})
+                    </p>
                   )}
                 </div>
 

@@ -79,7 +79,7 @@ const RegisterForm = () => {
             <Label htmlFor="name">Full Name</Label>
             <Input
               id="name"
-              placeholder="John Doe"
+              placeholder="Your full name"
               {...register('name', { required: 'Name is required' })}
             />
             {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
@@ -90,7 +90,7 @@ const RegisterForm = () => {
             <Input
               id="email"
               type="email"
-              placeholder="john@example.com"
+              placeholder="hello@example.com"
               {...register('email', { required: 'Email is required' })}
             />
             {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
@@ -136,7 +136,8 @@ const RegisterForm = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={() => {
-              window.location.href = 'http://localhost:8080/api/auth/google';
+              const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+              window.location.href = `${apiBase}/auth/google`;
             }}
           >
             <svg className="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
