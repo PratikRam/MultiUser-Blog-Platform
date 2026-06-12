@@ -30,10 +30,13 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isError) {
+      console.log("PrivateLayout - Auth Check Failed! Error:");
       logout();
       if (typeof window !== 'undefined') {
+        console.log("Hello");
         localStorage.removeItem('token');
       }
+    
       router.replace('/');
     }
   }, [isError, logout, router]);

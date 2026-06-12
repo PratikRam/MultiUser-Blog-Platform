@@ -1,12 +1,29 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "https://multiuser-blog-platform.onrender.com/api",
-    // baseURL: "http://localhost:8080/api",
+    baseURL: process.env.NEXT_PUBLIC_API_URL 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api`
+      : "http://localhost:8080/api",
     headers: {
         "Content-Type": "application/json",
     },
     withCredentials: true,
 });
+
+// Request interceptor to automatically add the Authorization header if token exists in localStorage
+api.interceptors.request.use(
+    (config) => {
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token");
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 export default api

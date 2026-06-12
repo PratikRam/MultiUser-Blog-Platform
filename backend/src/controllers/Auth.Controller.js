@@ -29,7 +29,7 @@ const registerController = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,       // false on localhost
+            secure: true,       // false on localhost
             sameSite: "none"
         })
         res.status(201).json({
@@ -60,12 +60,7 @@ const loginController = async (req, res) => {
             return
         }
 
-        if (!userOne.password) {
-            res.status(400).json({
-                message: "This account was registered using Google OAuth. Please log in using Google."
-            })
-            return
-        }
+
 
         const userPassword = await bcrypt.compare(password, userOne.password)
 
