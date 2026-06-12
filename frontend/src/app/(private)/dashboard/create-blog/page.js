@@ -19,7 +19,7 @@ import {
   Lock,
   UploadCloud,
   Trash2,
-  Link as LinkIcon
+  Link as LinkIcon    
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -360,7 +360,6 @@ const CreateBlogPage = () => {
                         </Button>
                       ) : (
                         <div className="relative rounded-lg overflow-hidden border border-border/40 aspect-video bg-muted flex items-center justify-center group">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img 
                             src={coverImage} 
                             alt="Cover preview" 

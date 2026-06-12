@@ -340,8 +340,8 @@ const ProfilePage = () => {
                         className="flex h-10 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
                         {...register('role')}
                       >
-                        <option value="VISITOR" className="bg-background text-foreground">Visitor - Read blogs</option>
-                        <option value="CREATOR" className="bg-background text-foreground">Creator - Write blogs</option>
+                        <option value="VISITOR" className="bg-background text-foreground">Visitor - Read blogs only</option>
+                        <option value="CREATOR" className="bg-background text-foreground">Creator - Read & Publish blogs</option>
                       </select>
                       {errors.role && (
                         <p className="text-xs text-red-500 mt-1">
