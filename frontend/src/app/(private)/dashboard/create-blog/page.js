@@ -369,7 +369,7 @@ const CreateBlogPage = () => {
                           <button
                             type="button"
                             onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
+                            className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full cursor-pointer shadow-md"
                             title="Remove image"
                           >
                             <Trash2 className="h-4 w-4" />
